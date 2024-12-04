@@ -30,5 +30,19 @@ $passwordExpires = [datetime]::FromFileTime($user."msDS-UserPasswordExpiryTimeCo
 Write-Host "Password will expire on $passwordExpires. `n" 
 } 
 
+# Prompt user to reset password
+$pwdchange = Read-Host -Prompt "Reset Password?(Y/N)"
+$newpwd = "{temp-password}"
+
+if ($pwdchange -eq "Y"){
+	try{ Set-ADAccountPassword -Identity $($username) -NewPassword $($newpwd) -Reset
+	  Set-ADUser -Identity $($username) -ChangePasswordAtLogin $true
+		Write-Host "Password has been changed to $($newpwd)."}
+	catch{ Write-Host "Failed to reset password." }
+}
+elseif ($pwdchange -eq "N"){Write-Host "Password Reset Canceled."}
+else{Write-Host "Invalid response."}
+
+
 # Pause for user input before exiting 
 Read-Host -Prompt "Press Enter to Continue.."
